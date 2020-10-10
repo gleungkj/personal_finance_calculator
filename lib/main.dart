@@ -1,15 +1,41 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'nav-drawer.dart';
 import 'data.dart';
 import 'animation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 void main() {
   runApp(MyApp());
 }
 
+class entryFonts extends TextStyle{
+
+  String get fontFamily => 'Ubuntu Light';
+
+
+  Widget build(BuildContext context) {
+    return TextField(
+
+      style: TextStyle(
+        fontFamily: 'Ubuntu Light',
+      ),
+
+    );
+  }
+}
+
+class displayFonts extends TextStyle{
+
+  // TODO: implement fontFamily
+  String get fontFamily => 'Ubuntu';
+}
+
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
-  @override
+
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Personal Finance Calculator',
@@ -35,10 +61,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _MyHomePageState extends State<MyHomePage>
+  with SingleTickerProviderStateMixin{
+  AnimationController transitionAnimation;
 
-
+  String storedvalue = '0';
 
   TextEditingController initialFunds = TextEditingController();
   TextEditingController annualInterestpercentage = TextEditingController();
@@ -58,8 +85,47 @@ class _MyHomePageState extends State<MyHomePage> {
 
   double result;
 
+
+
+
+  @override
+  void initState() {
+    super.initState();
+    transitionAnimation = AnimationController(
+      duration: Duration(seconds: 1),
+      vsync: this,
+    );
+    transitionAnimation.forward();
+    _loadCounter();
+  }
+
+  _loadCounter() async {
+//    loads counter from increment counter where input is tied to the particular key ('initialFunds', 'targetAmount' etc.), and ASSIGN
+//    to the original variable (e.g. store variable x into storedvalue => assign to key 'initialfunds' => assign variable x to getstring of 'initialfunds'
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      homefields.x = prefs.getString('initialFunds') ?? 0;
+      homefields.y = prefs.getString('annualInterestpercentage') ?? 0;
+      homefields.z = prefs.getString('targetAmount') ?? 0;
+      homefields.years = prefs.getString('NumberofYears') ?? 0;
+    });
+  }
+
+  _incrementCounter(counter_name, input) async {
+//    saves a particular input by assigning it to a defined key
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      storedvalue = input;
+      prefs.setString(counter_name, storedvalue);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+
+
 
     initialFunds.text = homefields.x;
     annualInterestpercentage.text = homefields.y;
@@ -72,141 +138,237 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text('Home'),
       ),
       body: Center(
-
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            SizedBox(
-              child: Center(
-                child: Text(
-                  'Initial Funds',
-                ),
-
-              ),
+            Expanded(
+                child: AnimationPage(
+                  start: 0.0,
+                  finish: 0.5,
+                  child: SizedBox(
+                    child: Center(
+                      child: Text(
+                        'Initial Funds',
+                        style:displayFonts(),
+                      ),
+                    ),
+                  ),
+                  animation: transitionAnimation,
+                )
             ),
-
-            TextFormField(
+            TextField(
+                style: entryFonts(),
                 controller: initialFunds,
                 keyboardType: TextInputType.number,
                 textAlign: TextAlign.center,
             ),
-            
-            SizedBox(
-              child: Center(
-                child: Text(
-                  'Annual interest percentage (%)',
-                ),
-              ),
+
+            Expanded(
+                child: AnimationPage(
+                  start: 0.125,
+                  finish: 0.675,
+                  child: SizedBox(
+                    child: Center(
+                      child: Text(
+                        'Annual Interest percentage (%)',
+                        style:displayFonts(),
+                      ),
+                    ),
+                  ),
+                  animation: transitionAnimation,
+                )
             ),
             TextFormField(
+              style: calculatedStatuses.uncalculatedinterest
+                  ? entryFonts():
+              TextStyle(color: Colors.red, fontWeight: FontWeight.w900),
               controller: annualInterestpercentage,
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
             ),
-            SizedBox(
-              child: Center(
-                child: Text(
-                  'Target Amount',
-                ),
-              ),
+            Expanded(
+                child: AnimationPage(
+                  start: 0.25,
+                  finish: 0.75,
+                  child: SizedBox(
+                    child: Center(
+                      child: Text(
+                        'Target Amount',
+                        style:displayFonts(),
+                      ),
+                    ),
+                  ),
+                  animation: transitionAnimation,
+                )
             ),
             TextFormField(
+              style: calculatedStatuses.uncalculatedtarget
+                  ? entryFonts():
+              TextStyle(color: Colors.red,fontWeight: FontWeight.w900),
               controller: targetAmount,
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
             ),
-            SizedBox(
-              child: Center(
-                child: Text(
-                  'Number of Years',
-                ),
-              ),
+            Expanded(
+                child: AnimationPage(
+                  start: 0.375,
+                  finish: 0.875,
+                  child: SizedBox(
+                    child: Center(
+                      child: Text(
+                        'Number of Years',
+                        style:displayFonts(),
+                      ),
+                    ),
+                  ),
+                  animation: transitionAnimation,
+                )
             ),
             TextFormField(
+              style: calculatedStatuses.uncalculatedyears
+                  ? entryFonts():
+              TextStyle(color: Colors.red,fontWeight: FontWeight.w900),
               controller: NumberofYears,
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
             ),
-            RaisedButton(
-              child: Center(
-                child: Text(
-                  'Import values from Assets and Liabilities',
-                )
+            Expanded(
+
+              child: Row(
+                children: <Widget>[
+                    Expanded(
+
+                      child: RaisedButton(
+
+                        child: Center(
+                            child: Text(
+                              'Import values from Assets and Liabilities',
+                            )
+                        ),
+                        onPressed: () {
+                          double totalmoney = double.parse(assetfields.sum) - double.parse(liabilityfields.sum);
+                          homefields.x = totalmoney.toStringAsFixed(2);
+
+                          setState(() {
+
+                          });
+                          return showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                // Retrieve the text the user has entered by using the
+                                // TextEditingController.
+                                content: Text('Loaded.'),
+
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: RaisedButton(
+                        child: Center(                            
+                            child: Text(
+                              'Clear all data fields',
+                            )
+                        ),
+                        onPressed: () {
+
+                          homefields.x = '';
+                          homefields.y = '';
+                          homefields.z = '';
+                          homefields.years = '';
+
+                          setState(() {
+
+                          });
+                          return showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                // Retrieve the text the user has entered by using the
+                                // TextEditingController.
+                                content: Text('Details cleared.'),
+
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  Expanded(
+                    child: RaisedButton(
+                      child: Center(
+                          child: Text(
+                            'Calculate',
+                          )
+                      ),
+                      onPressed: () {
+
+                        calculatedStatuses.uncalculatedinterest = true;
+                        calculatedStatuses.uncalculatedtarget = true;
+                        calculatedStatuses.uncalculatedyears = true;
+
+                        homefields.x = retainValue1(initialFunds.text);
+                        homefields.y = retainValue1(annualInterestpercentage.text);
+                        homefields.z = retainValue1(targetAmount.text);
+                        homefields.years = retainValue1(NumberofYears.text);
+
+                        String result = calculate(homefields.x, homefields.y, homefields.z, homefields.years);
+                        if (homefields.y == '0.00') {
+                          homefields.y = result;
+                          calculatedStatuses.uncalculatedinterest = false;
+                          print(calculatedStatuses.uncalculatedinterest);
+                        }
+                        else if (homefields.z == '0.00') {
+                          homefields.z = result;
+                          calculatedStatuses.uncalculatedtarget = false;
+                          print(calculatedStatuses.uncalculatedtarget);
+                        }
+                        else if (homefields.years == '0.00') {
+                          homefields.years = result;
+                          calculatedStatuses.uncalculatedyears = false;
+                          print(calculatedStatuses.uncalculatedyears);
+                        }
+
+                        _incrementCounter('initialFunds',homefields.x);
+                        _incrementCounter('annualInterestpercentage',homefields.y);
+                        _incrementCounter('targetAmount',homefields.z);
+                        _incrementCounter('NumberofYears',homefields.years);
+
+
+                        setState(() {
+
+
+                        });
+
+
+                        return showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              // Retrieve the text the user has entered by using the
+                              // TextEditingController.
+                              content: Text('Calculated.'),
+
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
-              onPressed: () {
-                double totalmoney = double.parse(assetfields.sum) - double.parse(liabilityfields.sum);
-                homefields.x = totalmoney.toStringAsFixed(2);
-
-                setState(() {
-
-                });
-                return showDialog(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      // Retrieve the text the user has entered by using the
-                      // TextEditingController.
-                      content: Text('Loaded.'),
-
-                    );
-                  },
-                );
-              },
             ),
+
+
+
           ],
+
         ),
       ),
-
-      floatingActionButton: FloatingActionButton(
-        // When the user presses the button, show an alert dialog containing the
-        // text that the user has entered into the text field.
-        onPressed: () {
-//          save(_MyHomePageState);
-        homefields.x = retainValue1(initialFunds.text);
-        homefields.y = retainValue1(annualInterestpercentage.text);
-        homefields.z = retainValue1(targetAmount.text);
-        homefields.years = retainValue1(NumberofYears.text);
-
-        String result = calculate(homefields.x, homefields.y, homefields.z, homefields.years);
-        print(result);
-        if (homefields.y == '0.00') {
-          homefields.y = result;
-        }
-        else if (homefields.z == '0.00') {
-          homefields.z = result;
-        }
-        else if (homefields.years == '0.00') {
-          homefields.years = result;
-        }
-//        homefields.retainValue1(x, y, z);
-        setState(() {
-
-        });
-//        retainValue1(x, y, z);
-
-          return showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                // Retrieve the text the user has entered by using the
-                // TextEditingController.
-                content: Text('Calculated.'),
-
-              );
-            },
-          );
-
-        },
-        tooltip: 'Show me the value!',
-        child: Icon(Icons.text_fields),
-
-      ),
-
-
-
-
-
 
     );
   }
@@ -226,7 +388,7 @@ class AssetPage extends StatefulWidget {
 class AssetPageState extends State<AssetPage>
   with SingleTickerProviderStateMixin{
   AnimationController transitionAnimation;
-  int _counter = 0;
+
   double result;
 
   final bankAccount = TextEditingController();
@@ -254,6 +416,7 @@ class AssetPageState extends State<AssetPage>
     transitionAnimation.forward();
   }
 
+
   @override
   Widget build(BuildContext context) {
 
@@ -275,69 +438,106 @@ class AssetPageState extends State<AssetPage>
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Expanded(
-              child:AnimatedBuilder(
-                animation: transitionAnimation,
-                builder: (context, child) {
-                  return SlideTransition(
-                    position: Tween<Offset>(
-                      begin: Offset(-1, 0),
-                      end: Offset(0, 0),
-                    ).animate(CurvedAnimation(
-                      parent: transitionAnimation,
-                      curve: Interval(0,0.5, curve: Curves.easeInCubic),
-                    )),
-                    child: child,
-                  );
-                },
+                child: AnimationPage(
+                  start: 0.0,
+                  finish: 0.5,
+                  child: SizedBox(
+                    child: Center(
+                      child: Text(
+                        'Bank Account',
+                        style:displayFonts(),
+                      ),
+                    ),
+                  ),
+                  animation: transitionAnimation,
+                )
+            ),
+//            TextField(
+//              style: entryFonts(),
+//              controller: bankAccount,
+//              keyboardType: TextInputType.number,
+//              textAlign: TextAlign.center,
+//            ),
+            TextField(
+              style: entryFonts(),
+              controller: bankAccount,
+              keyboardType: TextInputType.number,
+              textAlign: TextAlign.center,
+            ),
 
+
+            Expanded(
+              child: AnimationPage(
+                start: 0.125,
+                finish: 0.675,
                 child: SizedBox(
                   child: Center(
                     child: Text(
-                      'Bank account',
+                      'Pension',
+                      style:displayFonts(),
                     ),
-
                   ),
                 ),
-
-              ),
+                animation: transitionAnimation,
+              )
             ),
 
-
-            SizedBox(
-              child: Center(
-                child: Text(
-                  'Pension',
-                ),
-              ),
-            ),
             TextField(
+              style: entryFonts(),
               controller: pension,
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
             ),
-            SizedBox(
-              child: Center(
-                child: Text(
-                  'Investment',
-                ),
-              ),
+
+            Expanded(
+                child: AnimationPage(
+                  start: 0.25,
+                  finish: 0.75,
+                  child: SizedBox(
+                    child: Center(
+                      child: Text(
+                        'Investment',
+                        style: displayFonts(),
+                      ),
+                    ),
+                  ),
+                  animation: transitionAnimation,
+
+                )
             ),
+
             TextField(
+              style: entryFonts(),
               controller: investment,
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
             ),
-            SizedBox(
-              child: Center(
-                child: Text(
-                  'Asset Total',
-                ),
-              ),
+            Expanded(
+                child: AnimationPage(
+                  start: 0.375,
+                  finish: 0.875,
+                  child: SizedBox(
+                    child: Center(
+                      child: Text(
+                        'Asset Total',
+                        style: TextStyle(
+                          fontFamily: 'Ubuntu',
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+                  ),
+                  animation: transitionAnimation,
+                )
             ),
             TextField(
               enabled: false,
               controller: assetTotal,
               textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'Ubuntu',
+                color: Colors.red,
+              ),
             ),
 
 
@@ -349,6 +549,7 @@ class AssetPageState extends State<AssetPage>
         // text that the user has entered into the text field.
 
         onPressed: () {
+
 
           assetfields.x = retainValue1(bankAccount.text);
           assetfields.y = retainValue1(pension.text);
@@ -376,10 +577,6 @@ class AssetPageState extends State<AssetPage>
         child: Icon(Icons.text_fields),
 
       ),
-
-
-
-
     );
   }
 }
@@ -394,8 +591,10 @@ class LiabilitiesPage extends StatefulWidget {
 
 }
 
-class LiabilitiesPageState extends State<LiabilitiesPage> {
-  int _counter = 0;
+class LiabilitiesPageState extends State<LiabilitiesPage>
+    with SingleTickerProviderStateMixin{
+  AnimationController transitionAnimation;
+
 
   final creditCardLoan = TextEditingController();
   final mortgage = TextEditingController();
@@ -409,6 +608,16 @@ class LiabilitiesPageState extends State<LiabilitiesPage> {
     mortgage.dispose();
     studentLoan.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    transitionAnimation = AnimationController(
+      duration: Duration(seconds: 1),
+      vsync: this,
+    );
+    transitionAnimation.forward();
   }
 
   @override
@@ -431,54 +640,95 @@ class LiabilitiesPageState extends State<LiabilitiesPage> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            SizedBox(
-              child: Center(
-                child: Text(
-                  'Credit Card Loans',
-                ),
-
-              ),
+            Expanded(
+                child: AnimationPage(
+                  start: 0.0,
+                  finish: 0.5,
+                  child: SizedBox(
+                    child: Center(
+                      child: Text(
+                        'Credit Card Loans',
+                        style: displayFonts(),
+                      ),
+                    ),
+                  ),
+                  animation: transitionAnimation,
+                )
             ),
             TextField(
+              style: entryFonts(),
               controller: creditCardLoan,
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
             ),
-            SizedBox(
-              child: Center(
-                child: Text(
-                  'Mortgage',
-                ),
-              ),
+            Expanded(
+                child: AnimationPage(
+                  start: 0.125,
+                  finish: 0.675,
+                  child: SizedBox(
+                    child: Center(
+                      child: Text(
+                        'Mortgage',
+                        style: displayFonts(),
+                      ),
+                    ),
+                  ),
+                  animation: transitionAnimation,
+                )
             ),
             TextField(
+              style: entryFonts(),
               controller: mortgage,
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
             ),
-            SizedBox(
-              child: Center(
-                child: Text(
-                  'Student Loans',
-                ),
-              ),
+            Expanded(
+                child: AnimationPage(
+                  start: 0.25,
+                  finish: 0.75,
+                  child: SizedBox(
+                    child: Center(
+                      child: Text(
+                        'Student Loans',
+                        style: displayFonts(),
+                      ),
+                    ),
+                  ),
+                  animation: transitionAnimation,
+                )
             ),
             TextField(
+              style: entryFonts(),
               controller: studentLoan,
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
             ),
-            SizedBox(
-              child: Center(
-                child: Text(
-                  'Liabilities Total',
-                ),
-              ),
+            Expanded(
+                child: AnimationPage(
+                  start: 0.375,
+                  finish: 0.875,
+                  child: SizedBox(
+                    child: Center(
+                      child: Text(
+                        'Liabilities Total',
+                        style: TextStyle(
+                          fontFamily: 'Ubuntu',
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+                  ),
+                  animation: transitionAnimation,
+                )
             ),
             TextField(
               enabled: false,
               controller: liabilitiesTotal,
               textAlign: TextAlign.center,
+              style: TextStyle(
+              fontFamily: 'Ubuntu',
+              color: Colors.red,
+              ),
             ),
 
 
@@ -515,10 +765,6 @@ class LiabilitiesPageState extends State<LiabilitiesPage> {
         tooltip: 'Show me the value!',
         child: Icon(Icons.text_fields),
       ),
-
-
-
-
     );
   }
 }
@@ -534,7 +780,7 @@ class ExpensesPage extends StatefulWidget {
 }
 
 class ExpensesPageState extends State<ExpensesPage> {
-  int _counter = 0;
+
 
   final houseBills = TextEditingController();
   final creditCardBills = TextEditingController();
@@ -610,10 +856,6 @@ class ExpensesPageState extends State<ExpensesPage> {
         tooltip: 'Show me the value!',
         child: Icon(Icons.text_fields),
       ),
-
-
-
-
     );
   }
 }

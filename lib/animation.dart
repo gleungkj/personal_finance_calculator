@@ -1,47 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-class SlidingContainer extends StatelessWidget {
-  final double initialOffsetX;
-  final double intervalStart;
-  final double intervalEnd;
-  final Color color;
+class AnimationPage extends StatelessWidget {
+  AnimationPage({
+    @required this.child,
+    @required this.animation,
+    @required this.start,
+    @required this.finish,
+  });
 
-  const SlidingContainer({
-    Key key,
-    this.initialOffsetX,
-    this.intervalStart,
-    this.intervalEnd,
-    this.color,
-  }) : super(key: key);
+  final Widget child;
+
+  final animation;
+
+  double start;
+  double finish;
 
   @override
   Widget build(BuildContext context) {
-    final animation = Provider.of<Animation<double>>(context, listen: false);
-
-    return AnimatedBuilder(
-      animation: animation,
-      builder: (context, child) {
-        return SlideTransition(
-          position: Tween<Offset>(
-            begin: Offset(initialOffsetX, 0),
-            end: Offset(0, 0),
-          ).animate(
-            CurvedAnimation(
-              curve: Interval(
-                intervalStart,
-                intervalEnd,
-                curve: Curves.easeOutCubic,
-              ),
-              parent: animation,
-            ),
-          ),
-          child: child,
-        );
-      },
-      child: Container(
-        color: color,
-      ),
+    return SlideTransition(
+      position: Tween<Offset>(
+        begin: Offset(-1, 0),
+        end: Offset(0, 0),
+      ).animate(
+          CurvedAnimation(
+            curve: Interval(start, finish, curve: Curves.easeInCubic),
+            parent: animation,
+          )),
+      child: child,
     );
   }
+
 }

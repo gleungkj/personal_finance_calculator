@@ -1,5 +1,11 @@
 import 'dart:math';
 
+class calculatedStatus{
+  bool uncalculatedinterest = true;
+  bool uncalculatedtarget = true;
+  bool uncalculatedyears = true;
+}
+
 
 class homeValue {
   String x;
@@ -14,24 +20,16 @@ class homeValue {
     input2 = retainValue1(input2);
     input3 = retainValue1(input3);
     num total = double.parse(input1) + double.parse(input2) + double.parse(input3);
-    print(total);
+//    print(total);
     sum = total.toStringAsFixed(2);
   }
 }
 
 String retainValue1(input1) {
-  print(input1);
-
   if (input1 == ''){
     input1 = '0.00';
   };
-
-
-
   input1 = (double.parse(input1)).toStringAsFixed(2);
-
-  print(input1);
-
   return input1;
 }
 
@@ -75,3 +73,5 @@ var homefields = new homeValue();
 var assetfields = new homeValue();
 
 var liabilityfields = new homeValue();
+
+var calculatedStatuses = new calculatedStatus();
