@@ -4,6 +4,16 @@ class calculatedStatus{
   bool uncalculatedinterest = true;
   bool uncalculatedtarget = true;
   bool uncalculatedyears = true;
+
+  bool uncalculatedbankaccount = true;
+  bool uncalculatedpension = true;
+  bool uncalculatedinvestment = true;
+  bool uncalculatedassettotal = true;
+
+  bool uncalculatedcreditcard = true;
+  bool uncalculatedmortgage = true;
+  bool uncalculatedstudentloans = true;
+  bool uncalculatedliabilitytotal = true;
 }
 
 

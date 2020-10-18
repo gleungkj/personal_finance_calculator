@@ -21,6 +21,9 @@ class entryFonts extends TextStyle{
 
       style: TextStyle(
         fontFamily: 'Ubuntu Light',
+        color: Colors.black,
+        fontWeight: FontWeight.normal,
+
       ),
 
     );
@@ -389,6 +392,8 @@ class AssetPageState extends State<AssetPage>
   with SingleTickerProviderStateMixin{
   AnimationController transitionAnimation;
 
+  String storedvalue = '0';
+
   double result;
 
   final bankAccount = TextEditingController();
@@ -414,7 +419,32 @@ class AssetPageState extends State<AssetPage>
       vsync: this,
     );
     transitionAnimation.forward();
+    _loadCounter();
   }
+
+  _loadCounter() async {
+//    loads counter from increment counter where input is tied to the particular key ('initialFunds', 'targetAmount' etc.), and ASSIGN
+//    to the original variable (e.g. store variable x into storedvalue => assign to key 'initialfunds' => assign variable x to getstring of 'initialfunds'
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      assetfields.x = prefs.getString('Bank Account') ?? 0;
+      assetfields.y = prefs.getString('Pension') ?? 0;
+      assetfields.z = prefs.getString('Investment') ?? 0;
+      assetfields.sum = prefs.getString('Asset Total') ?? 0;
+    });
+  }
+
+  _incrementCounter(counter_name, input) async {
+//    saves a particular input by assigning it to a defined key
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      storedvalue = input;
+      prefs.setString(counter_name, storedvalue);
+    });
+  }
+
 
 
   @override
@@ -458,7 +488,7 @@ class AssetPageState extends State<AssetPage>
 //              keyboardType: TextInputType.number,
 //              textAlign: TextAlign.center,
 //            ),
-            TextField(
+            TextFormField(
               style: entryFonts(),
               controller: bankAccount,
               keyboardType: TextInputType.number,
@@ -482,7 +512,7 @@ class AssetPageState extends State<AssetPage>
               )
             ),
 
-            TextField(
+            TextFormField(
               style: entryFonts(),
               controller: pension,
               keyboardType: TextInputType.number,
@@ -506,7 +536,7 @@ class AssetPageState extends State<AssetPage>
                 )
             ),
 
-            TextField(
+            TextFormField(
               style: entryFonts(),
               controller: investment,
               keyboardType: TextInputType.number,
@@ -530,15 +560,16 @@ class AssetPageState extends State<AssetPage>
                   animation: transitionAnimation,
                 )
             ),
-            TextField(
+            TextFormField(
               enabled: false,
               controller: assetTotal,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: 'Ubuntu',
                 color: Colors.red,
+                ),
               ),
-            ),
+
 
 
           ],
@@ -550,12 +581,20 @@ class AssetPageState extends State<AssetPage>
 
         onPressed: () {
 
-
           assetfields.x = retainValue1(bankAccount.text);
           assetfields.y = retainValue1(pension.text);
           assetfields.z = retainValue1(investment.text);
 
+          _incrementCounter('Bank Account',assetfields.x);
+          _incrementCounter('Pension',assetfields.y);
+          _incrementCounter('Investment',assetfields.z);
+
+
+
+
           assetfields.sum_of_fields(assetfields.x, assetfields.y, assetfields.z);
+
+          _incrementCounter('Asset Total',assetfields.sum);
           setState(() {});
 
           return showDialog(
@@ -595,6 +634,8 @@ class LiabilitiesPageState extends State<LiabilitiesPage>
     with SingleTickerProviderStateMixin{
   AnimationController transitionAnimation;
 
+  String storedvalue = '0';
+
 
   final creditCardLoan = TextEditingController();
   final mortgage = TextEditingController();
@@ -618,6 +659,30 @@ class LiabilitiesPageState extends State<LiabilitiesPage>
       vsync: this,
     );
     transitionAnimation.forward();
+    _loadCounter();
+  }
+
+  _loadCounter() async {
+//    loads counter from increment counter where input is tied to the particular key ('initialFunds', 'targetAmount' etc.), and ASSIGN
+//    to the original variable (e.g. store variable x into storedvalue => assign to key 'initialfunds' => assign variable x to getstring of 'initialfunds'
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      liabilityfields.x = prefs.getString('Credit Card Loans') ?? 0;
+      liabilityfields.y = prefs.getString('Mortgage') ?? 0;
+      liabilityfields.z = prefs.getString('Student Loans') ?? 0;
+      liabilityfields.sum = prefs.getString('Liabilities Total') ?? 0;
+    });
+  }
+
+  _incrementCounter(counter_name, input) async {
+//    saves a particular input by assigning it to a defined key
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      storedvalue = input;
+      prefs.setString(counter_name, storedvalue);
+    });
   }
 
   @override
@@ -655,7 +720,7 @@ class LiabilitiesPageState extends State<LiabilitiesPage>
                   animation: transitionAnimation,
                 )
             ),
-            TextField(
+            TextFormField(
               style: entryFonts(),
               controller: creditCardLoan,
               keyboardType: TextInputType.number,
@@ -676,7 +741,7 @@ class LiabilitiesPageState extends State<LiabilitiesPage>
                   animation: transitionAnimation,
                 )
             ),
-            TextField(
+            TextFormField(
               style: entryFonts(),
               controller: mortgage,
               keyboardType: TextInputType.number,
@@ -697,7 +762,7 @@ class LiabilitiesPageState extends State<LiabilitiesPage>
                   animation: transitionAnimation,
                 )
             ),
-            TextField(
+            TextFormField(
               style: entryFonts(),
               controller: studentLoan,
               keyboardType: TextInputType.number,
@@ -721,7 +786,7 @@ class LiabilitiesPageState extends State<LiabilitiesPage>
                   animation: transitionAnimation,
                 )
             ),
-            TextField(
+            TextFormField(
               enabled: false,
               controller: liabilitiesTotal,
               textAlign: TextAlign.center,
@@ -744,8 +809,15 @@ class LiabilitiesPageState extends State<LiabilitiesPage>
           liabilityfields.y = retainValue1(mortgage.text);
           liabilityfields.z = retainValue1(studentLoan.text);
 
+          _incrementCounter('Credit Card Loans',liabilityfields.x);
+          _incrementCounter('Mortgage',liabilityfields.y);
+          _incrementCounter('Student Loans',liabilityfields.z);
+
 //          liabilityfields.retainValue1(x, y, z);
           liabilityfields.sum_of_fields(liabilityfields.x, liabilityfields.y, liabilityfields.z);
+
+          _incrementCounter('Liabilities Total',liabilityfields.sum);
+
           setState(() {});
           
           return showDialog(
